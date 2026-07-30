@@ -1,7 +1,7 @@
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import jwt from "jsonwebtoken";
-import pool from "../config/db.js";
+import {pool} from "../config/db.js";
 
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
 serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, "\n");
