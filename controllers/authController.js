@@ -16,16 +16,24 @@ export const googleLogin = async (req, res) => {
   try {
     const { idToken } = req.body;
 
+     console.log(idToken);
+
+
     // Verify Firebase ID Token
     const decodedToken = await getAuth().verifyIdToken(idToken);
 
     const { uid, email } = decodedToken;
 
+    console.log(uid);
+    console.log(email);
+
+
     let result = await pool.query(
       "SELECT * FROM users WHERE firebase_id = $1",
       [uid]
     );
-
+ 
+    console.log(result)
    
     let user;
 
