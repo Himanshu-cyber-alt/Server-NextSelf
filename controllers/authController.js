@@ -639,6 +639,8 @@ export const sendEmailAlert = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to send email",
+      actualError: error.message,
+      fullCrashReport: error.stack
     });
   }
 };
