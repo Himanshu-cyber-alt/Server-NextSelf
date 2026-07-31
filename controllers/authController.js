@@ -2,6 +2,17 @@ import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import jwt from "jsonwebtoken";
 import {pool} from "../config/db.js";
+import nodemailer from "nodemailer";
+
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
 
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
 serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, "\n");
@@ -12,32 +23,41 @@ if (getApps().length === 0) {
   });
 }
 
-export const googleLogin = async (req, res) => {
+// --- Add this near the top of your file ---
+
+
+
+export const googleLogin = async (req, res) => {  
+
+
   try {
-
-
-
-    
     const { idToken } = req.body;
 
-     console.log(idToken);
-
+   
+  
 
     // Verify Firebase ID Token
     const decodedToken = await getAuth().verifyIdToken(idToken);
 
     const { uid, email } = decodedToken;
 
-    console.log(uid);
-    console.log(email);
+ 
 
+   
+console.log("Testing database connection...");
+
+const test = await pool.query("SELECT NOW()");
+console.log("Database connected:", test.rows);
+
+console.log("Firebase UID:", uid);
 
     let result = await pool.query(
       "SELECT * FROM users WHERE firebase_id = $1",
       [uid]
     );
- 
-    console.log(result)
+
+   
+console.log("result ===> ", result)
    
     let user;
 
@@ -68,14 +88,20 @@ export const googleLogin = async (req, res) => {
       user,
     });
   } catch (err) {
-    console.error(err);
+     console.error("========== FIREBASE ERROR ==========");
+  console.error(err);
+  console.error("Message:", err.message);
+  console.error("Code:", err.code);
+  console.error("Stack:", err.stack);
 
-    return res.status(401).json({
-      success: false,
-      message: "Authentication failed",
-    });
+  return res.status(500).json({
+    success: false,
+    message: err.message,
+  });
+
   }
-};
+  
+}
 
 
 
@@ -570,6 +596,50 @@ export const getHistory = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
+    });
+  }
+};
+
+
+
+
+// --- Add this to the very bottom of your file ---
+export const sendEmailAlert = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    console.log(typeof email);
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email, // This sends to the email you pass from the frontend
+      subject: "🚨 TIME IS UP! Put the phone down!",
+      text: "Your screen time reward is officially over. Put the phone down and get back to work!",
+    };
+
+    
+
+    await transporter.sendMail(mailOptions);
+
+    console.log(transporter)
+
+    return res.status(200).json({
+      success: true,
+      message: "Alert sent successfully!",
+    });
+  } catch (error) {
+    console.error("Error sending email:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to send email",
     });
   }
 };

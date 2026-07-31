@@ -9,6 +9,7 @@ import authDiamond from "./routes/authDiamond.js"
 import authRewards from "./routes/authRewards.js"
 import authHistory from "./routes/authHistory.js"
 import authRoutes  from "./routes/authRoutes.js";
+import authEmail from "./routes/authEmail.js"
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use("/api/auth",getStatus);
 app.use("/api/auth",authDiamond);
 app.use("/api/auth",authRewards);
 app.use("/api/auth",authHistory);
+app.use("/api/auth",authEmail);
 
 
 
