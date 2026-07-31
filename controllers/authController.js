@@ -608,7 +608,6 @@ export const sendEmailAlert = async (req, res) => {
   try {
     const { email } = req.body;
 
-    console.log(typeof email);
 
     if (!email) {
       return res.status(400).json({
@@ -628,7 +627,7 @@ export const sendEmailAlert = async (req, res) => {
 
     await transporter.sendMail(mailOptions);
 
-    console.log(transporter)
+
 
     return res.status(200).json({
       success: true,
