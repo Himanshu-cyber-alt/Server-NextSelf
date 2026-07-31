@@ -628,29 +628,60 @@ export const sendEmailAlert = async (req, res) => {
       // ⚠️ IMPORTANT: On the free tier, you can ONLY send emails to the email address you used to sign up for Resend!
       to: email, 
       
-      subject: "🚨 STOP SCROLLING! Your Time is Up!",
+      subject: "⚔️ PATH OF THE GHOST — Time Has Expired",
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 3px solid #d9534f; border-radius: 15px; padding: 30px; text-align: center; background-color: #fff5f5;">
+        <div style="background-color: #0b0c10; padding: 40px 20px; font-family: 'Cinzel', 'Trajan Pro', 'Georgia', serif; text-align: center;">
           
-          <h1 style="color: #d9534f; font-size: 40px; margin-top: 0; text-transform: uppercase;">🛑 Time is Up!</h1>
-          
-          <p style="font-size: 20px; color: #333; font-weight: bold;">
-            Your screen time reward is officially over. 
-          </p>
-          
-          <!-- We use a direct web URL for the image so it loads instantly without attachments -->
-          <img src="https://images.unsplash.com/photo-1584694432168-b769f7e81cc3?q=80&w=600" alt="Stop Scrolling" style="width: 100%; max-width: 400px; border-radius: 10px; margin: 20px 0;" />
+          <!-- Main Container -->
+          <div style="max-width: 550px; margin: 0 auto; background-color: #1f2833; border: 2px solid #c5a059; border-radius: 4px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+            
+            <!-- Top Samurai Banner Header -->
+            <div style="background-color: #0b0c10; padding: 25px 20px; border-bottom: 2px solid #c5a059;">
+              <h1 style="color: #c5a059; font-size: 26px; letter-spacing: 4px; margin: 0; text-transform: uppercase;">
+                The Ghost's Code
+              </h1>
+              <p style="color: #6f2232; font-size: 12px; letter-spacing: 6px; margin: 5px 0 0 0; text-transform: uppercase;">
+                A Shinobi's Warning
+              </p>
+            </div>
 
-          <div style="background-color: #ffeaea; padding: 20px; border-radius: 10px; margin: 25px 0;">
-            <p style="font-size: 18px; color: #c9302c; font-style: italic; margin: 0;">
-              "${randomQuote}"
-            </p>
+            <!-- Cinematic Image (Ghost of Tsushima Vibe) -->
+            <div style="position: relative; line-height: 0;">
+              <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=800" alt="Samurai Discipline" style="width: 100%; height: 260px; object-fit: cover; filter: contrast(110%) brightness(85%);" />
+            </div>
+
+            <!-- Content Area -->
+            <div style="padding: 35px 30px; text-align: center;">
+              
+              <h2 style="color: #ffffff; font-size: 22px; letter-spacing: 2px; margin-top: 0; margin-bottom: 15px; text-transform: uppercase;">
+                Your Honor Demands Rest
+              </h2>
+              
+              <p style="color: #c5c6c7; font-size: 15px; line-height: 1.6; margin-bottom: 25px;">
+                The screen time allotted for your journey has ended. Continuing down this path leads only to distraction, away from your true craft.
+              </p>
+
+              <!-- Quote Box (Samurai Scroll Style) -->
+              <div style="background-color: #0b0c10; border-left: 4px solid #c5a059; border-right: 4px solid #c5a059; padding: 20px; margin: 25px 0;">
+                <p style="color: #e5e5e5; font-size: 15px; font-style: italic; font-family: Georgia, serif; margin: 0; line-height: 1.5;">
+                  "${randomQuote}"
+                </p>
+              </div>
+
+              <p style="color: #8892b0; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; margin-top: 30px; margin-bottom: 0;">
+                Sheathe your weapon. Return to reality.
+              </p>
+
+            </div>
+
+            <!-- Footer -->
+            <div style="background-color: #0b0c10; padding: 15px; border-top: 1px solid #2c3540; text-align: center;">
+              <p style="color: #454d59; font-size: 11px; letter-spacing: 2px; margin: 0; text-transform: uppercase;">
+                Tsushima Productivity Protocol &bull; Stand Firm
+              </p>
+            </div>
+
           </div>
-
-          <p style="font-size: 18px; color: #555; margin-bottom: 30px;">
-            Lock your phone screen, take a deep breath, and return to your tasks.
-          </p>
-
         </div>
       `,
     });
