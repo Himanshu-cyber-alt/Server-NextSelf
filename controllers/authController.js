@@ -2,24 +2,14 @@ import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import jwt from "jsonwebtoken";
 import {pool} from "../config/db.js";
-import nodemailer from "nodemailer";
-import dns from "dns"
-
-dns.setDefaultResultOrder("ipv4first");
+import { Resend } from 'resend';
 
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  family: 4, // 🚀 THIS IS THE MAGIC LINE: Forces Node to use IPv4 instead of IPv6
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
+
+
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
 serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, "\n");
@@ -615,7 +605,6 @@ export const sendEmailAlert = async (req, res) => {
   try {
     const { email } = req.body;
 
-
     if (!email) {
       return res.status(400).json({
         success: false,
@@ -623,31 +612,71 @@ export const sendEmailAlert = async (req, res) => {
       });
     }
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email, // This sends to the email you pass from the frontend
-      subject: "🚨 TIME IS UP! Put the phone down!",
-      text: "Your screen time reward is officially over. Put the phone down and get back to work!",
-    };
+    // Array of tough-love quotes to randomize
+    const quotes = [
+      "Discipline equals freedom. Put the phone down.",
+      "Your goals don't care how you feel. Get back to work.",
+      "Are you controlling your phone, or is your phone controlling you?",
+      "Stop trading your future for cheap dopamine."
+    ];
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
-    
+    const { data, error } = await resend.emails.send({
+      // ⚠️ IMPORTANT: On the free tier, you MUST use this exact 'from' address
+      from: 'onboarding@resend.dev', 
+      
+      // ⚠️ IMPORTANT: On the free tier, you can ONLY send emails to the email address you used to sign up for Resend!
+      to: email, 
+      
+      subject: "🚨 STOP SCROLLING! Your Time is Up!",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 3px solid #d9534f; border-radius: 15px; padding: 30px; text-align: center; background-color: #fff5f5;">
+          
+          <h1 style="color: #d9534f; font-size: 40px; margin-top: 0; text-transform: uppercase;">🛑 Time is Up!</h1>
+          
+          <p style="font-size: 20px; color: #333; font-weight: bold;">
+            Your screen time reward is officially over. 
+          </p>
+          
+          <!-- We use a direct web URL for the image so it loads instantly without attachments -->
+          <img src="https://images.unsplash.com/photo-1584694432168-b769f7e81cc3?q=80&w=600" alt="Stop Scrolling" style="width: 100%; max-width: 400px; border-radius: 10px; margin: 20px 0;" />
 
-    await transporter.sendMail(mailOptions);
+          <div style="background-color: #ffeaea; padding: 20px; border-radius: 10px; margin: 25px 0;">
+            <p style="font-size: 18px; color: #c9302c; font-style: italic; margin: 0;">
+              "${randomQuote}"
+            </p>
+          </div>
 
+          <p style="font-size: 18px; color: #555; margin-bottom: 30px;">
+            Lock your phone screen, take a deep breath, and return to your tasks.
+          </p>
 
+        </div>
+      `,
+    });
+
+    // Resend doesn't crash the server on failure, it returns an 'error' object.
+    // We catch it here and send it to the frontend so you can see if something went wrong.
+    if (error) {
+      console.error("Resend API Error:", error);
+      return res.status(400).json({ 
+        success: false, 
+        message: "Resend failed to send",
+        actualError: error.message 
+      });
+    }
 
     return res.status(200).json({
       success: true,
       message: "Alert sent successfully!",
     });
+    
   } catch (error) {
-    console.error("Error sending email:", error);
-
+    console.error("Server Error:", error);
     return res.status(500).json({
       success: false,
-      message: "Failed to send email",
-      actualError: error.message,
-      fullCrashReport: error.stack
+      message: "Backend crashed",
+      actualError: error.message
     });
   }
 };
