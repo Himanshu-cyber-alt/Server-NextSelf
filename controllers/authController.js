@@ -613,30 +613,19 @@ export const sendEmailAlert = async (req, res) => {
 
    const displayTime = studiedDuration || "your scheduled session";
 
-    // --- CALCULATE NUMERICAL HOURS FOR COLOR CODING ---
-    // This looks at your frontend string (e.g. "2 hr 30 mins" or parses out numbers)
-    // To make it completely reliable, you can pass a `totalMinutes` field from the frontend, 
-    // but here is a simple regex check on the string or you can adjust based on your data:
-    
-    let hoursValue = 0;
-    if (studiedDuration) {
-      const match = studiedDuration.match(/(\d+)\s*hr/);
-      if (match) {
-        hoursValue = parseInt(match[1], 10);
-      } else if (studiedDuration.includes("minutes") || studiedDuration.includes("mins")) {
-        hoursValue = 0; // Under an hour counts as tier 1
-      }
-    }
-
-    // --- COLOR TIER LOGIC ---
+    // --- COLOR TIER LOGIC USING EXACT MINUTES ---
+    // 1 hour = 60 mins, 3 hours = 180 mins, 6 hours = 360 mins, 8 hours = 480 mins
     let timeColor = "#c5a059"; // Default Gold
-    if (hoursValue >= 1 && hoursValue < 3) {
+    
+    const minutes = totalMinutes || 0;
+
+    if (minutes >= 60 && minutes < 180) {
       timeColor = "#d9534f"; // Red (1 to 3 hours)
-    } else if (hoursValue >= 3 && hoursValue < 6) {
+    } else if (minutes >= 180 && minutes < 360) {
       timeColor = "#f0ad4e"; // Yellow (3 to 6 hours)
-    } else if (hoursValue >= 6 && hoursValue < 8) {
+    } else if (minutes >= 360 && minutes < 480) {
       timeColor = "#5cb85c"; // Green (6 to 8 hours)
-    } else if (hoursValue >= 8) {
+    } else if (minutes >= 480) {
       timeColor = "#ffd700"; // Rich Gold (8 to 10+ hours)
     }
 
