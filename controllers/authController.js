@@ -611,7 +611,34 @@ export const sendEmailAlert = async (req, res) => {
       });
     }
 
-    const displayTime = studiedDuration || "your scheduled session";
+   const displayTime = studiedDuration || "your scheduled session";
+
+    // --- CALCULATE NUMERICAL HOURS FOR COLOR CODING ---
+    // This looks at your frontend string (e.g. "2 hr 30 mins" or parses out numbers)
+    // To make it completely reliable, you can pass a `totalMinutes` field from the frontend, 
+    // but here is a simple regex check on the string or you can adjust based on your data:
+    
+    let hoursValue = 0;
+    if (studiedDuration) {
+      const match = studiedDuration.match(/(\d+)\s*hr/);
+      if (match) {
+        hoursValue = parseInt(match[1], 10);
+      } else if (studiedDuration.includes("minutes") || studiedDuration.includes("mins")) {
+        hoursValue = 0; // Under an hour counts as tier 1
+      }
+    }
+
+    // --- COLOR TIER LOGIC ---
+    let timeColor = "#c5a059"; // Default Gold
+    if (hoursValue >= 1 && hoursValue < 3) {
+      timeColor = "#d9534f"; // Red (1 to 3 hours)
+    } else if (hoursValue >= 3 && hoursValue < 6) {
+      timeColor = "#f0ad4e"; // Yellow (3 to 6 hours)
+    } else if (hoursValue >= 6 && hoursValue < 8) {
+      timeColor = "#5cb85c"; // Green (6 to 8 hours)
+    } else if (hoursValue >= 8) {
+      timeColor = "#ffd700"; // Rich Gold (8 to 10+ hours)
+    }
 
     // Array of tough-love quotes to randomize
     const quotes = [
@@ -621,7 +648,6 @@ export const sendEmailAlert = async (req, res) => {
       "Stop trading your future for cheap dopamine.",
       "Concentrate all your thoughts upon the work at hand",
       "It always seems impossible until it's done."
-
     ];
     const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
@@ -637,15 +663,16 @@ export const sendEmailAlert = async (req, res) => {
             
             <!-- Top Samurai Banner Header -->
             <div style="background-color: #0b0c10; padding: 25px 20px; border-bottom: 2px solid #c5a059;">
-              <h1 style="color: #c5a059; font-size: 26px; letter-spacing: 4px; margin: 0; text-transform: uppercase;">
-                YOU ONLY STUDY ${displayTime}
+              <!-- Dynamic Color Applied Here -->
+              <h1 style="color: ${timeColor}; font-size: 26px; letter-spacing: 4px; margin: 0; text-transform: uppercase;">
+                 ${displayTime}
               </h1>
               <p style="color: #6f2232; font-size: 12px; letter-spacing: 6px; margin: 5px 0 0 0; text-transform: uppercase;">
                 DON'T WASTE YOUR TIME
               </p>
             </div>
 
-            <!-- Cinematic Image (Ghost of Tsushima Vibe) -->
+            <!-- Cinematic Image -->
             <div style="position: relative; line-height: 0;">
               <img src="https://images.unsplash.com/photo-1555993539-1732b0258235?q=80&w=800" alt="Samurai Discipline" style="width: 100%; height: 260px; object-fit: cover; filter: contrast(110%) brightness(85%);" />
             </div>
@@ -654,12 +681,10 @@ export const sendEmailAlert = async (req, res) => {
             <div style="padding: 35px 30px; text-align: center;">
               
               <h2 style="color: #ffffff; font-size: 22px; letter-spacing: 2px; margin-top: 0; margin-bottom: 15px; text-transform: uppercase;">
-                  DON'T BE LIKE YOUR PREVIOUS VERSION
+                 DON'T BE LIKE YOUR PREVIOUS VERSION
               </h2>
-              
-           
 
-              <!-- Quote Box (Samurai Scroll Style) -->
+              <!-- Quote Box -->
               <div style="background-color: #0b0c10; border-left: 4px solid #c5a059; border-right: 4px solid #c5a059; padding: 20px; margin: 25px 0;">
                 <p style="color: #e5e5e5; font-size: 15px; font-style: italic; font-family: Georgia, serif; margin: 0; line-height: 1.5;">
                   "${randomQuote}"
