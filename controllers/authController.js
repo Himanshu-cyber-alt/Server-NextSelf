@@ -615,17 +615,20 @@ export const sendEmailAlert = async (req, res) => {
 
     // Array of tough-love quotes to randomize
     const quotes = [
-      "Discipline equals freedom. Put the phone down.",
+      "The secret of getting ahead is getting started.",
       "Your goals don't care how you feel. Get back to work.",
-      "Are you controlling your phone, or is your phone controlling you?",
-      "Stop trading your future for cheap dopamine."
+      "Do what you can, with what you have, where you are",
+      "Stop trading your future for cheap dopamine.",
+      "Concentrate all your thoughts upon the work at hand",
+      "It always seems impossible until it's done."
+
     ];
     const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
     const { data, error } = await resend.emails.send({
       from: 'onboarding@resend.dev', 
       to: email, 
-      subject: "🕒 Time Has Expired",
+      subject: "𝟎𝟎:𝟎𝟎 Time Has Expired",
       html: `
         <div style="background-color: #0b0c10; padding: 40px 20px; font-family: 'Cinzel', 'Trajan Pro', 'Georgia', serif; text-align: center;">
           
@@ -635,29 +638,26 @@ export const sendEmailAlert = async (req, res) => {
             <!-- Top Samurai Banner Header -->
             <div style="background-color: #0b0c10; padding: 25px 20px; border-bottom: 2px solid #c5a059;">
               <h1 style="color: #c5a059; font-size: 26px; letter-spacing: 4px; margin: 0; text-transform: uppercase;">
-                YOUR TIME IS LIMITED
+                YOU ONLY STUDY ${displayTime}
               </h1>
               <p style="color: #6f2232; font-size: 12px; letter-spacing: 6px; margin: 5px 0 0 0; text-transform: uppercase;">
-                PUT YOUR PHONE DOWN
+                DON'T WASTE YOUR TIME
               </p>
             </div>
 
             <!-- Cinematic Image (Ghost of Tsushima Vibe) -->
             <div style="position: relative; line-height: 0;">
-              <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=800" alt="Samurai Discipline" style="width: 100%; height: 260px; object-fit: cover; filter: contrast(110%) brightness(85%);" />
+              <img src="https://images.unsplash.com/photo-1555993539-1732b0258235?q=80&w=800" alt="Samurai Discipline" style="width: 100%; height: 260px; object-fit: cover; filter: contrast(110%) brightness(85%);" />
             </div>
 
             <!-- Content Area -->
             <div style="padding: 35px 30px; text-align: center;">
               
               <h2 style="color: #ffffff; font-size: 22px; letter-spacing: 2px; margin-top: 0; margin-bottom: 15px; text-transform: uppercase;">
-                Your Honor Demands Rest
+                  DON'T BE LIKE YOUR PREVIOUS VERSION
               </h2>
               
-              <!-- Dynamic Study Duration Injection -->
-              <p style="color: #c5c6c7; font-size: 15px; line-height: 1.6; margin-bottom: 25px;">
-                You successfully focused for <strong style="color: #c5a059;">${displayTime}</strong>. That allotted journey has now ended. Continuing down this path leads only to distraction, away from your true craft.
-              </p>
+           
 
               <!-- Quote Box (Samurai Scroll Style) -->
               <div style="background-color: #0b0c10; border-left: 4px solid #c5a059; border-right: 4px solid #c5a059; padding: 20px; margin: 25px 0;">
@@ -667,7 +667,7 @@ export const sendEmailAlert = async (req, res) => {
               </div>
 
               <p style="color: #8892b0; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; margin-top: 30px; margin-bottom: 0;">
-                Sheathe your weapon. Return to reality.
+                Return to reality.
               </p>
 
             </div>
@@ -675,7 +675,7 @@ export const sendEmailAlert = async (req, res) => {
             <!-- Footer -->
             <div style="background-color: #0b0c10; padding: 15px; border-top: 1px solid #2c3540; text-align: center;">
               <p style="color: #454d59; font-size: 11px; letter-spacing: 2px; margin: 0; text-transform: uppercase;">
-                Tsushima Productivity Protocol &bull; Stand Firm
+                NextSelf Productivity Protocol &bull; Stand Firm
               </p>
             </div>
 
