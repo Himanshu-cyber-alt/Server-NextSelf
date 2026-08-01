@@ -600,10 +600,9 @@ export const getHistory = async (req, res) => {
 
 
 
-// --- Add this to the very bottom of your file ---
 export const sendEmailAlert = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, studiedDuration } = req.body;
 
     if (!email) {
       return res.status(400).json({
@@ -611,6 +610,8 @@ export const sendEmailAlert = async (req, res) => {
         message: "Email is required",
       });
     }
+
+    const displayTime = studiedDuration || "your scheduled session";
 
     // Array of tough-love quotes to randomize
     const quotes = [
@@ -622,13 +623,9 @@ export const sendEmailAlert = async (req, res) => {
     const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
     const { data, error } = await resend.emails.send({
-      // ⚠️ IMPORTANT: On the free tier, you MUST use this exact 'from' address
       from: 'onboarding@resend.dev', 
-      
-      // ⚠️ IMPORTANT: On the free tier, you can ONLY send emails to the email address you used to sign up for Resend!
       to: email, 
-      
-      subject: "⚔️ PATH OF THE GHOST — Time Has Expired",
+      subject: "🕒 Time Has Expired",
       html: `
         <div style="background-color: #0b0c10; padding: 40px 20px; font-family: 'Cinzel', 'Trajan Pro', 'Georgia', serif; text-align: center;">
           
@@ -638,10 +635,10 @@ export const sendEmailAlert = async (req, res) => {
             <!-- Top Samurai Banner Header -->
             <div style="background-color: #0b0c10; padding: 25px 20px; border-bottom: 2px solid #c5a059;">
               <h1 style="color: #c5a059; font-size: 26px; letter-spacing: 4px; margin: 0; text-transform: uppercase;">
-                The Ghost's Code
+                YOUR TIME IS LIMITED
               </h1>
               <p style="color: #6f2232; font-size: 12px; letter-spacing: 6px; margin: 5px 0 0 0; text-transform: uppercase;">
-                A Shinobi's Warning
+                PUT YOUR PHONE DOWN
               </p>
             </div>
 
@@ -657,8 +654,9 @@ export const sendEmailAlert = async (req, res) => {
                 Your Honor Demands Rest
               </h2>
               
+              <!-- Dynamic Study Duration Injection -->
               <p style="color: #c5c6c7; font-size: 15px; line-height: 1.6; margin-bottom: 25px;">
-                The screen time allotted for your journey has ended. Continuing down this path leads only to distraction, away from your true craft.
+                You successfully focused for <strong style="color: #c5a059;">${displayTime}</strong>. That allotted journey has now ended. Continuing down this path leads only to distraction, away from your true craft.
               </p>
 
               <!-- Quote Box (Samurai Scroll Style) -->
@@ -686,8 +684,6 @@ export const sendEmailAlert = async (req, res) => {
       `,
     });
 
-    // Resend doesn't crash the server on failure, it returns an 'error' object.
-    // We catch it here and send it to the frontend so you can see if something went wrong.
     if (error) {
       console.error("Resend API Error:", error);
       return res.status(400).json({ 
