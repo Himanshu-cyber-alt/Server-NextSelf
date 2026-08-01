@@ -145,12 +145,13 @@ export const getTasks = async (req, res) => {
   try {
     const { uuid } = req.params;
 
+    // We force Postgres to evaluate the dates in Indian Standard Time (Asia/Kolkata)
     const result = await pool.query(
       `
       SELECT *
       FROM tasks
       WHERE user_id = $1
-        AND DATE(created_at) = CURRENT_DATE
+        AND DATE(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata') = DATE(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata')
       ORDER BY created_at DESC;
       `,
       [uuid]
