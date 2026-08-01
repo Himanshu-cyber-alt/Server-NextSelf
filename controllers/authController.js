@@ -604,6 +604,7 @@ export const sendEmailAlert = async (req, res) => {
   try {
     const { email, studiedDuration } = req.body;
 
+ 
     if (!email) {
       return res.status(400).json({
         success: false,
@@ -611,113 +612,108 @@ export const sendEmailAlert = async (req, res) => {
       });
     }
 
-   const displayTime = studiedDuration || "your scheduled session";
+const displayTime = studiedDuration || "your scheduled session";
 
-    // --- COLOR TIER LOGIC USING EXACT MINUTES ---
-    // 1 hour = 60 mins, 3 hours = 180 mins, 6 hours = 360 mins, 8 hours = 480 mins
-    let timeColor = "#c5a059"; // Default Gold
-    
-    const minutes = totalMinutes || 0;
+console.log(displayTime);
+console.log(typeof displayTime)
 
-    if (minutes >= 60 && minutes < 180) {
-      timeColor = "#d9534f"; // Red (1 to 3 hours)
-    } else if (minutes >= 180 && minutes < 360) {
-      timeColor = "#f0ad4e"; // Yellow (3 to 6 hours)
-    } else if (minutes >= 360 && minutes < 480) {
-      timeColor = "#5cb85c"; // Green (6 to 8 hours)
-    } else if (minutes >= 480) {
-      timeColor = "#ffd700"; // Rich Gold (8 to 10+ hours)
-    }
+// Array of tough-love quotes to randomize
+const quotes = [
+  "The secret of getting ahead is getting started.",
+  "Your goals don't care how you feel. Get back to work.",
+  "Do what you can, with what you have, where you are",
+  "Stop trading your future for cheap dopamine.",
+  "Concentrate all your thoughts upon the work at hand",
+  "It always seems impossible until it's done."
+];
 
-    // Array of tough-love quotes to randomize
-    const quotes = [
-      "The secret of getting ahead is getting started.",
-      "Your goals don't care how you feel. Get back to work.",
-      "Do what you can, with what you have, where you are",
-      "Stop trading your future for cheap dopamine.",
-      "Concentrate all your thoughts upon the work at hand",
-      "It always seems impossible until it's done."
-    ];
-    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
-    const { data, error } = await resend.emails.send({
-      from: 'onboarding@resend.dev', 
-      to: email, 
-      subject: "𝟎𝟎:𝟎𝟎 Time Has Expired",
-      html: `
-        <div style="background-color: #0b0c10; padding: 40px 20px; font-family: 'Cinzel', 'Trajan Pro', 'Georgia', serif; text-align: center;">
-          
-          <!-- Main Container -->
-          <div style="max-width: 550px; margin: 0 auto; background-color: #1f2833; border: 2px solid #c5a059; border-radius: 4px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
-            
-            <!-- Top Samurai Banner Header -->
-            <div style="background-color: #0b0c10; padding: 25px 20px; border-bottom: 2px solid #c5a059;">
-              <!-- Dynamic Color Applied Here -->
-              <h1 style="color: ${timeColor}; font-size: 26px; letter-spacing: 4px; margin: 0; text-transform: uppercase;">
-                 ${displayTime}
-              </h1>
-              <p style="color: #6f2232; font-size: 12px; letter-spacing: 6px; margin: 5px 0 0 0; text-transform: uppercase;">
-                DON'T WASTE YOUR TIME
-              </p>
-            </div>
+const { data, error } = await resend.emails.send({
+  from: 'onboarding@resend.dev',
+  to: email,
+  subject: "𝟎𝟎:𝟎𝟎 Time Has Expired",
+  html: `
+    <div style="background-color: #0b0c10; padding: 40px 20px; font-family: 'Cinzel', 'Trajan Pro', 'Georgia', serif; text-align: center;">
 
-            <!-- Cinematic Image -->
-            <div style="position: relative; line-height: 0;">
-              <img src="https://images.unsplash.com/photo-1555993539-1732b0258235?q=80&w=800" alt="Samurai Discipline" style="width: 100%; height: 260px; object-fit: cover; filter: contrast(110%) brightness(85%);" />
-            </div>
+      <!-- Main Container -->
+      <div style="max-width: 550px; margin: 0 auto; background-color: #1f2833; border: 2px solid #c5a059; border-radius: 4px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
 
-            <!-- Content Area -->
-            <div style="padding: 35px 30px; text-align: center;">
-              
-              <h2 style="color: #ffffff; font-size: 22px; letter-spacing: 2px; margin-top: 0; margin-bottom: 15px; text-transform: uppercase;">
-                 DON'T BE LIKE YOUR PREVIOUS VERSION
-              </h2>
+        <!-- Top Samurai Banner Header -->
+        <div style="background-color: #0b0c10; padding: 25px 20px; border-bottom: 2px solid #c5a059;">
+          <h1 style="color: #5cb85c; font-size: 26px; letter-spacing: 4px; margin: 0; text-transform: uppercase;">
+            ${displayTime}
+          </h1>
 
-              <!-- Quote Box -->
-              <div style="background-color: #0b0c10; border-left: 4px solid #c5a059; border-right: 4px solid #c5a059; padding: 20px; margin: 25px 0;">
-                <p style="color: #e5e5e5; font-size: 15px; font-style: italic; font-family: Georgia, serif; margin: 0; line-height: 1.5;">
-                  "${randomQuote}"
-                </p>
-              </div>
-
-              <p style="color: #8892b0; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; margin-top: 30px; margin-bottom: 0;">
-                Return to reality.
-              </p>
-
-            </div>
-
-            <!-- Footer -->
-            <div style="background-color: #0b0c10; padding: 15px; border-top: 1px solid #2c3540; text-align: center;">
-              <p style="color: #454d59; font-size: 11px; letter-spacing: 2px; margin: 0; text-transform: uppercase;">
-                NextSelf Productivity Protocol &bull; Stand Firm
-              </p>
-            </div>
-
-          </div>
+          <p style="color: #6f2232; font-size: 12px; letter-spacing: 6px; margin: 5px 0 0 0; text-transform: uppercase;">
+            DON'T WASTE YOUR TIME
+          </p>
         </div>
-      `,
-    });
 
-    if (error) {
-      console.error("Resend API Error:", error);
-      return res.status(400).json({ 
-        success: false, 
-        message: "Resend failed to send",
-        actualError: error.message 
-      });
-    }
+        <!-- Cinematic Image (Ghost of Tsushima Vibe) -->
+        <div style="position: relative; line-height: 0;">
+          <img
+            src="https://images.unsplash.com/photo-1555993539-1732b0258235?q=80&w=800"
+            alt="Samurai Discipline"
+            style="width: 100%; height: 260px; object-fit: cover; filter: contrast(110%) brightness(85%);"
+          />
+        </div>
 
-    return res.status(200).json({
-      success: true,
-      message: "Alert sent successfully!",
-    });
-    
-  } catch (error) {
-    console.error("Server Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Backend crashed",
-      actualError: error.message
-    });
-  }
-};
+        <!-- Content Area -->
+        <div style="padding: 35px 30px; text-align: center;">
+
+          <h2 style="color: #ffffff; font-size: 22px; letter-spacing: 2px; margin-top: 0; margin-bottom: 15px; text-transform: uppercase;">
+            DON'T BE LIKE YOUR PREVIOUS VERSION
+          </h2>
+
+          <!-- Quote Box (Samurai Scroll Style) -->
+          <div style="background-color: #0b0c10; border-left: 4px solid #c5a059; border-right: 4px solid #c5a059; padding: 20px; margin: 25px 0;">
+            <p style="color: #e5e5e5; font-size: 15px; font-style: italic; font-family: Georgia, serif; margin: 0; line-height: 1.5;">
+              "${randomQuote}"
+            </p>
+          </div>
+
+          <p style="color: #8892b0; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; margin-top: 30px; margin-bottom: 0;">
+            Return to reality.
+          </p>
+
+        </div>
+
+        <!-- Footer -->
+        <div style="background-color: #0b0c10; padding: 15px; border-top: 1px solid #2c3540; text-align: center;">
+          <p style="color: #454d59; font-size: 11px; letter-spacing: 2px; margin: 0; text-transform: uppercase;">
+            NextSelf Productivity Protocol &bull; Stand Firm
+          </p>
+        </div>
+
+      </div>
+    </div>
+  `,
+});
+
+if (error) {
+  console.error("Resend API Error:", error);
+  return res.status(400).json({
+    success: false,
+    message: "Resend failed to send",
+    actualError: error.message
+  });
+}
+
+return res.status(200).json({
+  success: true,
+  message: "Alert sent successfully!",
+});
+
+} catch (error) {
+  console.error("Server Error:", error);
+  return res.status(500).json({
+    success: false,
+    message: "Backend crashed",
+    actualError: error.message
+  });
+}
+
+}
+
+
