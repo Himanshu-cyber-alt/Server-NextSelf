@@ -102,14 +102,6 @@ export const tasks = async (req, res) => {
   try {
     const { title, uuid } = req.body;
 
-
-
-
-
-
-
-  
-
     if (!title || !uuid) {
       return res.status(400).json({
         success: false,
@@ -117,13 +109,19 @@ export const tasks = async (req, res) => {
       });
     }
 
+    // 👉 1. Create a pure text string of the date in India (e.g., "8/3/2026")
+    const myTime = new Date().toLocaleDateString("en-US", { 
+      timeZone: "Asia/Kolkata" 
+    });
+
+    // 👉 2. Save it to the new my_time column
     const result = await pool.query(
       `
-      INSERT INTO tasks (user_id, title)
-      VALUES ($1, $2)
+      INSERT INTO tasks (user_id, title, my_time)
+      VALUES ($1, $2, $3)
       RETURNING *;
       `,
-      [uuid, title]
+      [uuid, title, myTime]
     );
 
     return res.status(201).json({
@@ -133,7 +131,6 @@ export const tasks = async (req, res) => {
 
   } catch (error) {
     console.error("Create Task Error:", error);
-
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -141,19 +138,34 @@ export const tasks = async (req, res) => {
   }
 };
 
+
+
+
+
+
 export const getTasks = async (req, res) => {
   try {
     const { uuid } = req.params;
 
+    // 👉 1. What is the text string for today in India? (e.g., "8/3/2026")
+
+    
+    const today = new Date().toLocaleDateString("en-US", { 
+      timeZone: "Asia/Kolkata" 
+    });
+
+
+
+    // 👉 2. Just match the strings! Zero timezone math required.
     const result = await pool.query(
       `
       SELECT *
       FROM tasks
-      WHERE user_id = $1
-        AND DATE(created_at) = CURRENT_DATE
-      ORDER BY created_at DESC;
+      WHERE user_id = $1 
+      AND my_time = $2
+      ORDER BY created_at ASC;
       `,
-      [uuid]
+      [uuid, today]
     );
 
     return res.status(200).json({
@@ -161,14 +173,16 @@ export const getTasks = async (req, res) => {
       tasks: result.rows,
     });
   } catch (error) {
-    console.log(error);
-
+    console.log("Get Tasks Error:", error);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
     });
   }
 };
+
+
+
 
     
 export const getstatus = async (req, res) => {
