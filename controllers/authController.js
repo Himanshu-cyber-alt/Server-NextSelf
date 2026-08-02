@@ -38,15 +38,10 @@ export const googleLogin = async (req, res) => {
 
     const { uid, email } = decodedToken;
 
- 
 
-   
-console.log("Testing database connection...");
 
-const test = await pool.query("SELECT NOW()");
-console.log("Database connected:", test.rows);
 
-console.log("Firebase UID:", uid);
+
 
     let result = await pool.query(
       "SELECT * FROM users WHERE firebase_id = $1",
@@ -54,7 +49,7 @@ console.log("Firebase UID:", uid);
     );
 
    
-console.log("result ===> ", result)
+
    
     let user;
 
@@ -108,7 +103,12 @@ export const tasks = async (req, res) => {
     const { title, uuid } = req.body;
 
 
-   
+
+
+
+
+
+  
 
     if (!title || !uuid) {
       return res.status(400).json({
@@ -145,13 +145,12 @@ export const getTasks = async (req, res) => {
   try {
     const { uuid } = req.params;
 
-    // We force Postgres to evaluate the dates in Indian Standard Time (Asia/Kolkata)
     const result = await pool.query(
       `
       SELECT *
       FROM tasks
       WHERE user_id = $1
-        AND DATE(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata') = DATE(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata')
+        AND DATE(created_at) = CURRENT_DATE
       ORDER BY created_at DESC;
       `,
       [uuid]
@@ -718,3 +717,73 @@ return res.status(200).json({
 }
 
 
+
+// GET all growth topics for a user
+export const getGrowthTopics = async (req, res) => {
+  try {
+    const { uuid } = req.params;
+    const result = await pool.query(
+      `SELECT * FROM growth_topics WHERE user_id = $1 ORDER BY time_minutes DESC;`,
+      [uuid]
+    );
+    res.status(200).json({ success: true, topics: result.rows });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error fetching topics" });
+  }
+};
+
+// ADD a new growth topic (starts at 0 minutes)
+export const addGrowthTopic = async (req, res) => {
+  try {
+    const { uuid, topic } = req.body;
+
+
+    // Save the topic in lowercase to make matching easier later
+const lowerTopic = topic.toLowerCase();
+    
+   
+
+    const result = await pool.query(
+      `INSERT INTO growth_topics (user_id, topic, time_minutes) 
+       VALUES ($1, $2, 0) RETURNING *;`,
+      [uuid, lowerTopic]
+    );
+
+    res.status(201).json({ success: true, topic: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error adding topic" });
+  }
+};
+
+// DELETE a growth topic
+export const deleteGrowthTopic = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query(`DELETE FROM growth_topics WHERE id = $1;`, [id]);
+    res.status(200).json({ success: true, message: "Topic deleted" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error deleting topic" });
+  }
+};
+
+export const updateGrowthTime = async (req, res) => {
+  try {
+    const { uuid, taskTitle } = req.body;
+    
+    // THE MAGIC SQL: 
+    // It looks at all your topics. If the taskTitle ILIKE (contains) the topic, 
+    // it adds 45 to the time_minutes.
+    await pool.query(
+      `UPDATE growth_topics 
+       SET time_minutes = time_minutes + 45 
+       WHERE user_id = $1 
+       AND $2 ILIKE '%' || topic || '%'`,
+      [uuid, taskTitle]
+    );
+
+    res.status(200).json({ success: true, message: "Growth updated if match found!" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Error updating growth time" });
+  }
+};
